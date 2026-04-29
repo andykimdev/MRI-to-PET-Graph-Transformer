@@ -73,7 +73,7 @@ ST_TO_SUVR_REGION = {
 
 # Maps SUVR region name -> Braak stage index
 # 0 = early (I/II), 1 = middle (III/IV), 2 = late (V/VI)
-REGION_TO_BRAAK = {
+SUVR_REGION_TO_BRAAK = {
     # Stage I/II (early)
     "CTX_LH_ENTORHINAL": 0, "CTX_RH_ENTORHINAL": 0,
     "CTX_LH_PARAHIPPOCAMPAL": 0, "CTX_RH_PARAHIPPOCAMPAL": 0,
@@ -119,7 +119,7 @@ def validate_lookup():
     """Confirm every ST code maps to a region with a Braak stage."""
     missing = []
     for st, region in ST_TO_SUVR_REGION.items():
-        if region not in REGION_TO_BRAAK:
+        if region not in SUVR_REGION_TO_BRAAK:
             missing.append((st, region))
     if missing:
         raise ValueError(f"Missing Braak stage for: {missing}")
