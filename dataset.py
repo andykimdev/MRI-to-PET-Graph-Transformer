@@ -1,12 +1,14 @@
 import sys
-sys.path.append("preprocessing")
+sys.path.insert(0, "preprocessing") # since directories.py is in "preprocessing" folder
 
 import torch 
 import numpy as np
 import json
-from torch_geometric.data import Data, Dataset
+from torch.utils.data import Dataset
+from torch_geometric.data import Data
 from pathlib import Path
 import directories as dir 
+print(dir.__file__)
 
 class BrainTauDataset(Dataset):
     def __init__(self, processed_dir, split):
@@ -29,7 +31,7 @@ class BrainTauDataset(Dataset):
             splits = json.load(f)
         
         split_rids = set(splits[split]) # setting it as set() for performance boosting 
-        self.indices = np.array([i for i, rid in enumerate(self.subjects_ids)
+        self.indices = np.array([i for i, rid in enumerate(self.subject_ids)
                                  if rid in split_rids])
         
         # Building edge structure
@@ -38,25 +40,25 @@ class BrainTauDataset(Dataset):
         for i in range(n_regions):
             for j in range(n_regions):
                 if i != j:
-                    rows.apend(i)
+                    rows.append(i)
                     cols.append(j)
         self.edge_index = torch.tensor([rows, cols], dtype=torch.long)
 
         # Converting braak to tensor
         self.braak_tensor = torch.tensor(self.braak, dtype=torch.long)
         
-        # lenth method
-        def len(self):
-            return len(self.indices)
-        
-        # split method 
-        def get(self, idx):
-            global_idx = self.indices[idx]
-            x = torch.tensor(self.X[global_idx], dtype=torch.float)
-            y = torch.tensor(self.Y[global_idx], dtype=torch.float)
+    # lenth method
+    def __len__(self):
+        return len(self.indices)
+    
+    # split method 
+    def __getitem__(self, idx):
+        global_idx = self.indices[idx]
+        x = torch.tensor(self.X[global_idx], dtype=torch.float)
+        y = torch.tensor(self.Y[global_idx], dtype=torch.float)
 
-            return Data(x=x, edge_index=self.edge_index, y=y, braak=self.braak_tensor, subject_id=int(self.subject_ids[global_idx]))
-        
+        return Data(x=x, edge_index=self.edge_index, y=y, braak=self.braak_tensor, subject_id=int(self.subject_ids[global_idx]))
+    
 if __name__ == "__main__":
     train_ds = BrainTauDataset(dir.ROOT / "data" / "processed", "train")
     val_ds = BrainTauDataset(dir.ROOT / "data" / "processed", "val")
