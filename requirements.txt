@@ -1,1 +1,10 @@
-pandas
+torch==2.11.0
+torch-geometric==2.7.0
+numpy==2.4.4
+pandas==3.0.2
+scikit-learn==1.8.0
+scipy==1.17.1
+matplotlib==3.10.8
+nilearn==0.13.1
+nibabel==5.4.2
+pyreadr==0.5.4
